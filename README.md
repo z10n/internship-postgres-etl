@@ -25,16 +25,45 @@ Production-ready ETL-решение для загрузки данных о ст
 
 ## 🏗 Architecture
 
-```
-┌─────────────┐     ┌──────────────┐     ┌──────────────┐
-│  CLI Input  │────▶│  App Container│────▶│  PostgreSQL  │
-│ (JSON paths)│     │  (Python)    │     │  Container   │
-└─────────────┘     └──────────────┘     └──────────────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ JSON/XML out │
-                    └──────────────┘
+```mermaid
+flowchart LR
+    subgraph Docker["Docker Compose Environment"]
+        direction TB
+        
+        subgraph APP["app container (Python 3.11)"]
+            CLI["CLI Interface<br/>argparse"]
+            LOADER["JSON Loader<br/>src/loaders"]
+            DB_CLIENT["DB Connector<br/>src/db"]
+            QUERIES["Analytics Queries<br/>src/db/queries.py"]
+            EXPORTER["Exporter<br/>src/exporters"]
+        end
+        
+        subgraph DB["db container (PostgreSQL 15)"]
+            PG["PostgreSQL<br/>students & rooms tables<br/>+ indexes"]
+        end
+        
+        subgraph VOLUMES["Volumes"]
+            DATA[("./data<br/>JSON input files")]
+            OUT[("./output<br/>JSON/XML results")]
+        end
+    end
+    
+    CLI --> LOADER
+    LOADER -->|parsed data| DB_CLIENT
+    DB_CLIENT -->|INSERT| PG
+    PG -->|SELECT| QUERIES
+    QUERIES -->|resultset| EXPORTER
+    EXPORTER -->|write| OUT
+    
+    DATA -->|mount| LOADER
+    PG -.->|schema.sql| PG
+    
+    USER(("👤 User")) -->|CLI args| CLI
+    
+    style Docker fill:#f9f9f9,stroke:#333
+    style APP fill:#e1f5ff,stroke:#0288d1
+    style DB fill:#fff3e0,stroke:#f57c00
+    style VOLUMES fill:#f3e5f5,stroke:#7b1fa2
 ```
 
 ## 🚀 Quick Start
