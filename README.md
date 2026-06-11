@@ -17,7 +17,7 @@ Production-ready ETL-решение для загрузки данных о ст
 
 ## 🛠 Tech Stack
 
-- **Language:** Python 3.11
+- **Language:** Python 3.12
 - **Database:** PostgreSQL 15
 - **Containerization:** Docker, Docker Compose
 - **Libraries:** `psycopg2-binary`, `argparse`, `xml.etree.ElementTree`
