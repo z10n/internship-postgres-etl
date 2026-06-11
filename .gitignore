@@ -1,0 +1,30 @@
+﻿# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+/output/*
+!/output/.gitkeep
+/data/*.json
+*.log
+
+# Docker
+.dockerignore
