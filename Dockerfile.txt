@@ -1,23 +1,18 @@
-# Используем конкретную версию + slim для минимального размера образа
+# Используем официальный образ Python 3.12 (совпадает с твоим venv)
 FROM python:3.12-slim
 
-# Устанавливаем рабочую директорию
+# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем только requirements.txt сначала (для кэширования слоёв Docker)
+# Копируем зависимости и устанавливаем их
+# Делаем это ДО копирования кода, чтобы использовать кэш Docker
 COPY requirements.txt .
-
-# Устанавливаем зависимости без кэша pip (меньше размер образа)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем исходный код
+# Копируем исходный код проекта
 COPY src/ ./src/
 COPY config/ ./config/
-COPY sql/ ./sql/
 
-# Создаём непривилегированного пользователя (security best practice)
-RUN useradd --create-home appuser && chown -R appuser:appuser /app
-USER appuser
-
-# Точка входа через модуль (не через скрипт)
+# Точка входа: запуск CLI через модуль
+# Аргументы (--students, --rooms, --format) передаются при docker compose run
 ENTRYPOINT ["python", "-m", "src.cli"]
