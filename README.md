@@ -75,7 +75,7 @@ flowchart LR
 ### Installation & Run
 ```bash
 # 1. Клонируй репозиторий
-git clone https://github.com/your-username/internship-postgres-etl.git
+git clone https://github.com/z10n/internship-postgres-etl.git
 cd internship-postgres-etl
 
 # 2. Создай .env файл с секретами
