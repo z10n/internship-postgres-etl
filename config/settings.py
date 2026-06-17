@@ -5,11 +5,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Settings:
-    """Неизменяемая конфигурация приложения.
-    
-    Загружает значения из переменных окружения с дефолтами.
-    frozen=True гарантирует, что настройки нельзя изменить случайно.
-    """
+    """Immutable application configuration loaded from environment variables."""
     postgres_host: str = os.getenv("POSTGRES_HOST", "db")
     postgres_port: int = int(os.getenv("POSTGRES_PORT", "5432"))
     postgres_db: str = os.getenv("POSTGRES_DB", "internship")

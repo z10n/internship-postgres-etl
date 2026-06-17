@@ -1,0 +1,7 @@
+﻿# Force LF line endings and UTF-8 encoding for scripts and configs
+*.py text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+Dockerfile text eol=lf
+.env text eol=lf

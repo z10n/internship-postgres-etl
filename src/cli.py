@@ -1,4 +1,4 @@
-"""Точка входа ETL-пайплайна."""
+"""ETL pipeline entry point."""
 import argparse
 import logging
 import sys
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def parse_args() -> argparse.Namespace:
-    """Парсит аргументы командной строки."""
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description="ETL: Load students/rooms JSON into PostgreSQL and run analytics"
     )
@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def setup_logging(level: str) -> None:
-    """Настраивает логирование приложения."""
+    """Configure application logging."""
     logging.basicConfig(
         level=getattr(logging, level.upper(), logging.INFO),
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -38,23 +38,20 @@ def setup_logging(level: str) -> None:
 
 
 def main() -> None:
-    """Оркестрирует весь ETL-пайплайн."""
-    # 1. Парсинг аргументов и настройка
+    """Orchestrate the entire ETL pipeline."""
     args = parse_args()
     settings = Settings()
     setup_logging(settings.log_level)
 
     logger.info("Starting ETL pipeline")
 
-    # 2. Загрузка данных
     loader = JsonLoader()
     students = loader.load(args.students)
     rooms = loader.load(args.rooms)
 
-    # 3. Работа с БД
     connector = DatabaseConnector(settings)
     with connector.get_connection() as conn:
-        # ⚠️ ВАЖНО: rooms сначала (FK constraint!)
+        # IMPORTANT: Insert rooms first due to foreign key constraint!
         connector.bulk_insert(conn, "rooms", ("id", "name"), rooms)
         connector.bulk_insert(
             conn,
@@ -63,14 +60,12 @@ def main() -> None:
             students,
         )
 
-        # 4. Аналитические запросы
         results: list[dict] = []
         results.extend(AnalyticsQueries.get_students_per_room(conn))
         results.extend(AnalyticsQueries.get_lowest_avg_age_rooms(conn))
         results.extend(AnalyticsQueries.get_largest_age_diff_rooms(conn))
         results.extend(AnalyticsQueries.get_mixed_sex_rooms(conn))
 
-    # 5. Экспорт
     exporter = Exporter()
     output_path = f"output/results.{args.format}"
     exporter.export(results, args.format, output_path)

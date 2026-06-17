@@ -1,0 +1,20 @@
+# 1. Останавливаем и удаляем старые контейнеры (чтобы начать с чистого листа)
+docker compose down
+
+# 2. Собираем образ заново без кэша (гарантирует, что все исправленные файлы попадут внутрь)
+docker compose build --no-cache
+
+# 3. Запускаем только базу данных в фоновом режиме
+docker compose up -d db
+
+# 4. Ждём 5-10 секунд, чтобы база данных успела полностью запуститься и пройти healthcheck
+Start-Sleep -Seconds 10
+
+# 5. Запускаем ETL-пайплайн для формата JSON
+docker compose run --rm app --students data/students.json --rooms data/rooms.json --format json
+
+# 6. Запускаем ETL-пайплайн для формата XML
+docker compose run --rm app --students data/students.json --rooms data/rooms.json --format xml
+
+# 7. Проверяем, что файлы успешно создались в папке output
+dir output

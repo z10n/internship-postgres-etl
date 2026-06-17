@@ -1,12 +1,10 @@
 SET client_encoding = 'UTF8';
 
--- Таблица комнат
 CREATE TABLE IF NOT EXISTS rooms (
     id      INTEGER PRIMARY KEY,
     name    VARCHAR(50) NOT NULL UNIQUE
 );
 
--- Таблица студентов
 CREATE TABLE IF NOT EXISTS students (
     id        INTEGER PRIMARY KEY,
     name      VARCHAR(100) NOT NULL,
@@ -15,12 +13,12 @@ CREATE TABLE IF NOT EXISTS students (
     room      INTEGER NOT NULL REFERENCES rooms(id) ON DELETE RESTRICT
 );
 
--- Индексы для оптимизации аналитических запросов
--- 1. Для JOIN и GROUP BY по комнатам
+-- Indexes for optimizing analytical queries
+-- 1. Optimizes JOINs and GROUP BY on room
 CREATE INDEX IF NOT EXISTS idx_students_room ON students(room);
 
--- 2. Для вычисления возраста и сортировок (покрывающий индекс)
+-- 2. Optimizes age calculation and sorting
 CREATE INDEX IF NOT EXISTS idx_students_birthday ON students(birthday);
 
--- 3. Составной индекс для запроса "разнополые студенты"
+-- 3. Composite index for the "mixed sex rooms" query
 CREATE INDEX IF NOT EXISTS idx_students_room_sex ON students(room, sex);
